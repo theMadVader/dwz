@@ -2,6 +2,7 @@ package dwz
 
 import (
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -56,7 +57,7 @@ func TestNextLengthError(t *testing.T) {
 	}
 }
 
-func TestInvalidResultError(t *testing.T) {
+func TestNextInvalidResultError(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
 	wanterr := fmt.Errorf("result must end with .0 or .5")
@@ -64,4 +65,33 @@ func TestInvalidResultError(t *testing.T) {
 	if err.Error() != wanterr.Error() {
 		t.Errorf("\n got: %v\nwant: %v", err, wanterr)
 	}
+}
+
+var (
+	testOldRating = Rating{1566, 30, 34}
+	testResult    = 2.5
+	testOpps      = []int{1619, 1524, 1389, 1688, 1808, 1679}
+	testNewRating = Rating{1563, 31, 34}
+)
+
+func TestNextNoError(t *testing.T) {
+	curr := testOldRating
+
+	want := testNewRating
+	got, _ := curr.Next(testResult, testOpps)
+	if *got != want {
+		t.Errorf("got: %v, want: %v", got, want)
+	}
+}
+
+func TestExpectedPoints(t *testing.T) {
+	want := 2.592
+	got := testOldRating.expectedPoints(testOpps)
+	if !almostEqual(got, want, 1e-3) {
+		t.Errorf("got: %v, want: %v", got, want)
+	}
+}
+
+func almostEqual(x, y, eps float64) bool {
+	return math.Abs(x-y) < eps
 }

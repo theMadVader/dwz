@@ -101,7 +101,8 @@ func isValidResult(r float64) bool {
 // defeat the second player, based on the rating difference.
 func (r *Rating) expectedValue(oppr int) float64 {
 	diff := r.current - oppr
-	return 1.0 / (1.0 + math.Pow10(-diff/400))
+	val := 1.0 / (1.0 + math.Pow(10.0, float64(-diff)/400.0))
+	return val
 }
 
 // expectedPoints is the sum of expected Values against a list of opponents
