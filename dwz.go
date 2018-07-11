@@ -67,7 +67,7 @@ func (r *Rating) Index() int {
 // The result parameter must be a float64 that ends with .0 or .5
 // and it must be smaller or equal to the length of oppRatings,
 // otherwise there will be a non-nil error
-func (r *Rating) Next(result float64, oppRatings []Rating) (*Rating, error) {
+func (r *Rating) Next(result float64, oppRatings []int) (*Rating, error) {
 	if !isValidResult(result) {
 		return nil, errorInvalidResult
 	}
@@ -99,13 +99,13 @@ func isValidResult(r float64) bool {
 
 // expectedValue tells how high the propability is for the first player to
 // defeat the second player, based on the rating difference.
-func (r *Rating) expectedValue(oppr Rating) float64 {
-	diff := r.current - oppr.current
+func (r *Rating) expectedValue(oppr int) float64 {
+	diff := r.current - oppr
 	return 1.0 / (1.0 + math.Pow10(-diff/400))
 }
 
 // expectedPoints is the sum of expected Values against a list of opponents
-func (r *Rating) expectedPoints(opps []Rating) float64 {
+func (r *Rating) expectedPoints(opps []int) float64 {
 	sum := 0.0
 	for _, opr := range opps {
 		sum += r.expectedValue(opr)

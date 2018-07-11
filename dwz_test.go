@@ -50,7 +50,7 @@ func TestNextLengthError(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
 	wanterr := errorMorePointsThanGames
-	_, err := r.Next(3.5, []Rating{Rating{1000, 1, 20}})
+	_, err := r.Next(3.5, []int{1000})
 	if err.Error() != wanterr.Error() {
 		t.Errorf("\n got: %v\nwant: %v", err, wanterr)
 	}
@@ -60,7 +60,7 @@ func TestInvalidResultError(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
 	wanterr := fmt.Errorf("result must end with .0 or .5")
-	_, err := r.Next(0.12345, []Rating{Rating{1000, 1, 20}})
+	_, err := r.Next(0.12345, []int{1000})
 	if err.Error() != wanterr.Error() {
 		t.Errorf("\n got: %v\nwant: %v", err, wanterr)
 	}
