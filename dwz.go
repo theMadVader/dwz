@@ -36,13 +36,13 @@ func (r Rating) String() string {
 // The error will be non-nil if any parameter is negative.
 func New(current, index, age int) (*Rating, error) {
 	if current < 0 {
-		return nil, fmt.Errorf("rating value cannot be less than zero")
+		return nil, errorNegativeValue
 	}
 	if index < 0 {
-		return nil, fmt.Errorf("rating index cannot be less than zero")
+		return nil, errorNegativeIndex
 	}
 	if age < 0 {
-		return nil, fmt.Errorf("age cannot be less than zero")
+		return nil, errorNegativeAge
 	}
 
 	return &Rating{current, index, age}, nil
@@ -69,10 +69,10 @@ func (r *Rating) Index() int {
 // otherwise there will be a non-nil error
 func (r *Rating) Next(result float64, oppRatings []Rating) (*Rating, error) {
 	if !isValidResult(result) {
-		return nil, fmt.Errorf("result must end with .0 or .5")
+		return nil, errorInvalidResult
 	}
 	if result > float64(len(oppRatings)) {
-		return nil, fmt.Errorf("too many points for too few opponents")
+		return nil, errorMorePointsThanGames
 	}
 
 	next := *r

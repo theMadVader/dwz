@@ -28,19 +28,19 @@ func TestNew(t *testing.T) {
 	var wanterr error
 
 	_, err = New(-4, 5, 20)
-	wanterr = fmt.Errorf("rating value cannot be less than zero")
+	wanterr = errorNegativeValue
 	if wanterr.Error() != err.Error() {
 		t.Errorf("\n got: %v\nwant: %v", got, want)
 	}
 
 	_, err = New(1234, -1, 20)
-	wanterr = fmt.Errorf("rating index cannot be less than zero")
+	wanterr = errorNegativeIndex
 	if wanterr.Error() != err.Error() {
 		t.Errorf("\n got: %v\nwant: %v", got, want)
 	}
 
 	_, err = New(1234, 5, -2)
-	wanterr = fmt.Errorf("age cannot be less than zero")
+	wanterr = errorNegativeAge
 	if wanterr.Error() != err.Error() {
 		t.Errorf("\n got: %v\nwant: %v", got, want)
 	}
@@ -49,19 +49,19 @@ func TestNew(t *testing.T) {
 func TestNextLengthError(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
-	want := fmt.Errorf("too many points for too few opponents")
-	_, got := r.Next(3.5, []Rating{Rating{1000, 1, 20}})
-	if got.Error() != want.Error() {
-		t.Errorf("\n got: %v\nwant: %v", got, want)
+	wanterr := errorMorePointsThanGames
+	_, err := r.Next(3.5, []Rating{Rating{1000, 1, 20}})
+	if err.Error() != wanterr.Error() {
+		t.Errorf("\n got: %v\nwant: %v", err, wanterr)
 	}
 }
 
 func TestInvalidResultError(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
-	want := fmt.Errorf("result must end with .0 or .5")
-	_, got := r.Next(0.12345, []Rating{Rating{1000, 1, 20}})
-	if got.Error() != want.Error() {
-		t.Errorf("\n got: %v\nwant: %v", got, want)
+	wanterr := fmt.Errorf("result must end with .0 or .5")
+	_, err := r.Next(0.12345, []Rating{Rating{1000, 1, 20}})
+	if err.Error() != wanterr.Error() {
+		t.Errorf("\n got: %v\nwant: %v", err, wanterr)
 	}
 }
