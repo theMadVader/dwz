@@ -76,14 +76,17 @@ func (r *Rating) Next(result float64, oppRatings []Rating) (*Rating, error) {
 	}
 
 	next := *r
-	// TODO: calculate next.current
-	// R_n = R_o + 800 * (W - W_c) / (E + n)
+	// R_n = R_o + 800 * (W - W_e) / (E + n)
 	// R_n: new Rating
 	// R_o: old Rating
 	// W: Wins (Draw = 0.5)
-	// W_c: expectedPoints
-	// E: development coefficient
+	// W_e: expectedPoints
 	// n: number of games
+	// E: development coefficient, E = E_0 * f_B + S_Br
+	We := r.expectedPoints(oppRatings)
+	coeff := r.coeff(result, We)
+	next.current = next.current + int(math.Round(800.0*(result-We)/(coeff+float64(len(oppRatings)))))
+
 	next.index++
 	return &next, nil
 }
@@ -96,16 +99,52 @@ func isValidResult(r float64) bool {
 
 // expectedValue tells how high the propability is for the first player to
 // defeat the second player, based on the rating difference.
-func expectedValue(myr, oppr Rating) float64 {
-	diff := myr.current - oppr.current
+func (r *Rating) expectedValue(oppr Rating) float64 {
+	diff := r.current - oppr.current
 	return 1.0 / (1.0 + math.Pow10(-diff/400))
 }
 
 // expectedPoints is the sum of expected Values against a list of opponents
-func expectedPoints(myr Rating, opps []Rating) float64 {
+func (r *Rating) expectedPoints(opps []Rating) float64 {
 	sum := 0.0
 	for _, opr := range opps {
-		sum += expectedValue(myr, opr)
+		sum += r.expectedValue(opr)
 	}
 	return sum
+}
+
+func (r *Rating) coeff(W, We float64) float64 {
+	// E: development coefficient, E = E_0 * f_B + S_Br
+
+	// J = {5, if age <= 20; 10, if 21 <= age <= 25; 15, if age > 25}
+	var J float64
+	switch {
+	case r.age <= 20:
+		J = 5.0
+	case r.age > 20 && r.age <= 25:
+		J = 10.0
+	default:
+		J = 15.0
+	}
+
+	// E_0 = (R_o / 1000)^4 + J
+	E0 := math.Pow(float64(r.current)/1000.0, 4.0) + J
+
+	// f_B = {0.5 <= (R_o / 2000) <= 1.0, if age <= 20 && W >= W_e; 1.0 in every other case}
+	fB := 1.0
+	if fb := float64(r.current) / 2000.0; W >= We && r.age <= 20 && fb < 1.0 {
+		if fb < 0.5 {
+			fB = 0.5
+		} else {
+			fB = fb
+		}
+	}
+
+	// S_Br = {exp((1300-R_o)/150) - 1, if R_o < 1300 && W < W_e; 0.0 in every other case}
+	SBr := 0.0
+	if W < We && r.current < 1300 {
+		SBr = math.Exp((1300.0 - float64(r.current)) / 150.0)
+	}
+
+	return math.Round(E0*fB + SBr)
 }
