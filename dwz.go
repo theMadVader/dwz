@@ -28,7 +28,7 @@ type Rating struct {
 
 // String implements the Stringer interface
 func (r Rating) String() string {
-	return fmt.Sprintf("%d-%d (%d)", r.current, r.index, r.age)
+	return fmt.Sprintf("%d-%d", r.current, r.index)
 }
 
 // New constructs a Rating based on the given inputs.
