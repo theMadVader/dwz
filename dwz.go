@@ -90,7 +90,8 @@ func (r *Rating) Next(result float64, oppRatings []int) (*Rating, error) {
 	// E: development coefficient, E = E_0 * f_B + S_Br
 	We := r.expectedPoints(oppRatings)
 	coeff := r.coeff(result, We)
-	next.current = next.current + int(math.Round(800.0*(result-We)/(coeff+float64(len(oppRatings)))))
+	n := float64(len(oppRatings))
+	next.current = next.current + int(math.Round(800.0*(result-We)/(coeff+n)))
 
 	next.index++
 	return &next, nil
