@@ -114,6 +114,7 @@ func (r *Rating) expectedPoints(opps []int) float64 {
 	return sum
 }
 
+// coeff calculates the development coefficient E
 func (r *Rating) coeff(W, We float64) float64 {
 	// E: development coefficient, E = E_0 * f_B + S_Br
 
@@ -147,5 +148,6 @@ func (r *Rating) coeff(W, We float64) float64 {
 		SBr = math.Exp((1300.0 - float64(r.current)) / 150.0)
 	}
 
+	// Result is rounded to the next integer
 	return math.Round(E0*fB + SBr)
 }
