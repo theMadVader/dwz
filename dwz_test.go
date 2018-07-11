@@ -8,7 +8,7 @@ import (
 func TestString(t *testing.T) {
 	r := Rating{1234, 5, 20}
 
-	want := "1234-5"
+	want := "1234-5 (20)"
 	got := fmt.Sprintf("%v", r)
 	if got != want {
 		t.Errorf("got: %v, want: %v", got, want)

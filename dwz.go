@@ -27,7 +27,7 @@ type Rating struct {
 }
 
 func (r Rating) String() string {
-	return fmt.Sprintf("%d-%d", r.current, r.index)
+	return fmt.Sprintf("%d-%d (%d)", r.current, r.index, r.age)
 }
 
 // New constructs a Rating based on the given inputs.
