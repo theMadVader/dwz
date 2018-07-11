@@ -26,14 +26,19 @@ type Rating struct {
 	age     int
 }
 
+// String implements the Stringer interface
 func (r Rating) String() string {
 	return fmt.Sprintf("%d-%d (%d)", r.current, r.index, r.age)
 }
 
 // New constructs a Rating based on the given inputs.
 //
+// To construct a DWZ rating of "1234-5" for a player of age 35,
+// call
+//		New(1234, 5, 35)
+//
 // New returns a pointer to the constructed Rating and an error.
-// The error will be non-nil if any parameter is negative.
+// The *Rating will be nil and the error will be non-nil if any parameter is negative.
 func New(current, index, age int) (*Rating, error) {
 	if current < 0 {
 		return nil, errorNegativeValue
@@ -62,7 +67,7 @@ func (r *Rating) Index() int {
 	return r.index
 }
 
-// Next calculates a new Rating, based on the results
+// Next calculates a new Rating, based on the result and the opponents' ratings.
 //
 // The result parameter must be a float64 that ends with .0 or .5
 // and it must be smaller or equal to the length of oppRatings,
