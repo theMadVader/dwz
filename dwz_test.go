@@ -67,26 +67,52 @@ func TestNextInvalidResultError(t *testing.T) {
 	}
 }
 
+type dwzTestData struct {
+	oldRating  Rating
+	result     float64
+	oppRatings []int
+	newRating  Rating
+}
+
 var (
-	testOldRating = Rating{1566, 30, 34}
-	testResult    = 2.5
-	testOpps      = []int{1619, 1524, 1389, 1688, 1808, 1679}
-	testNewRating = Rating{1563, 31, 34}
+	dwzTestSet = []dwzTestData{
+		dwzTestData{
+			Rating{1566, 30, 34},
+			2.5,
+			[]int{1619, 1524, 1389, 1688, 1808, 1679},
+			Rating{1563, 31, 34},
+		},
+		dwzTestData{
+			Rating{1214, 3, 14},
+			2.5,
+			[]int{1682, 1447, 1495, 1370, 1563, 768},
+			Rating{1271, 4, 14},
+		},
+	}
+)
+
+const (
+	maxDeviation = 1
 )
 
 func TestNextNoError(t *testing.T) {
-	curr := testOldRating
+	for _, testdat := range dwzTestSet {
+		curr := testdat.oldRating
 
-	want := testNewRating
-	got, _ := curr.Next(testResult, testOpps)
-	if *got != want {
-		t.Errorf("got: %v, want: %v", got, want)
+		want := testdat.newRating
+		got, _ := curr.Next(testdat.result, testdat.oppRatings)
+		if *got != want {
+			// Allow rating value to be off by 1
+			if abs(got.Current()-want.Current()) > maxDeviation {
+				t.Errorf("got: %v, want: %v", got, want)
+			}
+		}
 	}
 }
 
 func TestExpectedPoints(t *testing.T) {
 	want := 2.592
-	got := testOldRating.expectedPoints(testOpps)
+	got := dwzTestSet[0].oldRating.expectedPoints(dwzTestSet[0].oppRatings)
 	if !almostEqual(got, want, 1e-3) {
 		t.Errorf("got: %v, want: %v", got, want)
 	}
@@ -94,4 +120,11 @@ func TestExpectedPoints(t *testing.T) {
 
 func almostEqual(x, y, eps float64) bool {
 	return math.Abs(x-y) < eps
+}
+
+func abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
 }
